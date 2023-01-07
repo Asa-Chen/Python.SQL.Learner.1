@@ -40,12 +40,13 @@ class Journal:
         with DBConnection('data.db') as connection:
             cursor = connection.cursor()
             cursor.execute("INSERT INTO Journal VALUES (?, ?, ?)", (date, entry, notes))
+            connection.commit()
 
     def load_list(self):
         with DBConnection('data.db') as connection:
             cursor = connection.cursor()
             cursor.execute("SELECT * FROM Journal ORDER BY date")
-            self.journal = [{'date': journ[0], 'entry': journ[1]} for journ in cursor.fetchall()]
+            self.journal = [{'date': journ[0], 'entry': journ[1], 'notes': journ[2]} for journ in cursor.fetchall()]
 
     def print(self):
         self.load_list()
@@ -65,12 +66,14 @@ class Journal:
         target = target.strftime("%Y-%m-%d")
         for dict in self.journal:
             if target == dict['date']:
-                print(f"Your entry for {dict['date']} is:\n{dict['entry']}\nInput entire entry with changes: ")
-                entry = self.entry_input()
-                notes = input("Please add any notes: ")
+                print(f"Your entry for {dict['date']} is:\n{dict['entry']}\nWith this note: {dict['notes']}\n"
+                      f"Input entire entry with changes: ")
+                new_entry = self.entry_input()
+                new_notes = input("Please add any notes: ")
                 with DBConnection('data.db') as connection:
                     cursor = connection.cursor()
-                    cursor.execute("UPDATE Journal SET entry=? AND notes=? WHERE date=?", (entry, notes, target,))
+                    cursor.execute("UPDATE Journal SET entry=?, notes=? WHERE date=?", (new_entry, new_notes, target,))
+                    connection.commit()
                 break
         else:
             print("That date is not in your log.")
