@@ -34,13 +34,20 @@ class Journal:
         date = input("Input the date as YYYY-MM-DD: ")
         entry = ""
         date = datetime.strptime(date, "%Y-%m-%d").date()
-        print("Input your entry: ")
-        entry += self.entry_input()
-        notes = input("Please add any notes: ")
-        with DBConnection('data.db') as connection:
-            cursor = connection.cursor()
-            cursor.execute("INSERT INTO Journal VALUES (?, ?, ?)", (date, entry, notes))
-            connection.commit()
+        date = date.strftime("%Y-%m-%d")
+        self.load_list()
+        for dict in self.journal:
+            if date == dict["date"]:
+                print("That date is already logged.")
+                break
+        else:
+            print("Input your entry: ")
+            entry += self.entry_input()
+            notes = input("Please add any notes: ")
+            with DBConnection('data.db') as connection:
+                cursor = connection.cursor()
+                cursor.execute("INSERT INTO Journal VALUES (?, ?, ?)", (date, entry, notes))
+                connection.commit()
 
     def load_list(self):
         with DBConnection('data.db') as connection:
