@@ -1,6 +1,4 @@
-import time
-
-from Utility.database import DBConnection
+from Utility.database import DBConnection #Local imports of sqlite3 data controls
 from datetime import datetime
 intro = "Welcome to the gen 0.1 fitness journal app."
 options = """
@@ -10,7 +8,6 @@ Search - Search for an entry
 Update - Update a log entry
 Delete - Delete Entry
 Quit - Quit application
-
 Your Choice: """
 entry_prompt = """Input your workout entry, do not include the warmup.
 Enter exercises as 'Sets x Reps @ Weight' or 'time @ exercise' type 'end' to stop the entry.
@@ -18,7 +15,7 @@ Enter exercises as 'Sets x Reps @ Weight' or 'time @ exercise' type 'end' to sto
 
 
 
-class Journal:
+class Journal: #Journal object which houses all functions and local data
     def __init__(self):
         self.journal = []
         with DBConnection('data.db') as connection:
@@ -32,7 +29,9 @@ class Journal:
         return entry
 
     def add_entry(self):
-        date = input("Input the date as YYYY-MM-DD: ")
+        date = input("Input the date as YYYY-MM-DD or type 'exit': ")
+        if date.lower() == 'exit':
+            return
         entry = ""
         date = datetime.strptime(date, "%Y-%m-%d").date()
         date = date.strftime("%Y-%m-%d")
@@ -62,7 +61,9 @@ class Journal:
             print(f"On {entry['date']} you logged:\n {entry['entry']}\n With these notes: {entry['notes']}")
 
     def delete_entry(self):
-        target = input("Please input a date you'd like to delete: ")
+        target = input("Please input a date you'd like to delete as YYYY-MM-DD or type 'exit': ")
+        if target.lower() == 'exit':
+            return
         target = datetime.strptime(target, "%Y-%m-%d").date()
         target = target.strftime("%Y-%m-%d")
         with DBConnection('data.db') as connection:
@@ -71,7 +72,9 @@ class Journal:
 
     def search_entry(self):
         self.load_list()
-        target = input("Please input a date you'd like to search for: ")
+        target = input("Please input a date you'd like to search for as YYYY-MM-DD or type 'exit': ")
+        if target.lower() == 'exit':
+            return
         target = datetime.strptime(target, "%Y-%m-%d").date()
         target = target.strftime("%Y-%m-%d")
         for dict in self.journal:
@@ -83,7 +86,9 @@ class Journal:
 
     def update_entry(self):
         self.load_list()
-        target = input("Please input a date you'd like to update as YYYY-MM-DD: ")
+        target = input("Please input a date you'd like to update as YYYY-MM-DD or type 'exit': ")
+        if target.lower() == 'exit':
+            return
         target = datetime.strptime(target, "%Y-%m-%d").date()
         target = target.strftime("%Y-%m-%d")
         for dict in self.journal:
