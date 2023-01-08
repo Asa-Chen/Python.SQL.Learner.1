@@ -6,6 +6,7 @@ intro = "Welcome to the gen 0.1 fitness journal app."
 options = """
 Log - Log workout
 Print - Display all workouts
+Search - Search for an entry
 Update - Update a log entry
 Delete - Delete Entry
 Quit - Quit application
@@ -62,9 +63,23 @@ class Journal:
 
     def delete_entry(self):
         target = input("Please input a date you'd like to delete: ")
+        target = datetime.strptime(target, "%Y-%m-%d").date()
+        target = target.strftime("%Y-%m-%d")
         with DBConnection('data.db') as connection:
             cursor = connection.cursor()
             cursor.execute("DELETE FROM Journal WHERE date =?", (target,))
+
+    def search_entry(self):
+        self.load_list()
+        target = input("Please input a date you'd like to search for: ")
+        target = datetime.strptime(target, "%Y-%m-%d").date()
+        target = target.strftime("%Y-%m-%d")
+        for dict in self.journal:
+            if target == dict['date']:
+                print(f"{dict['date']} has this entry: \n{dict['entry']} \nWith these notes: {dict['notes']}")
+                break
+        else:
+            print("No entry with that date was found.")
 
     def update_entry(self):
         self.load_list()
@@ -95,6 +110,8 @@ def menu():
             fitJournal.add_entry()
         elif choice == 'print':
             fitJournal.print()
+        elif choice == 'search':
+            fitJournal.search_entry()
         elif choice == 'update':
             fitJournal.update_entry()
         elif choice == 'delete':
