@@ -1,4 +1,4 @@
-from Utility.database import DBConnection #Local imports of sqlite3 data controls
+from Utility.DBConnection import DBConnection #Local imports of sqlite3 context manager
 from datetime import datetime
 intro = "Welcome to the gen 0.1 fitness journal app."
 options = """
